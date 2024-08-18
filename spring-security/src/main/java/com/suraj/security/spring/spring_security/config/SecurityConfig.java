@@ -2,6 +2,9 @@ package com.suraj.security.spring.spring_security.config;
 
 import static org.springframework.security.config.Customizer.withDefaults;
 
+import javax.sql.DataSource;
+
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.security.config.annotation.method.configuration.EnableMethodSecurity;
@@ -25,6 +28,9 @@ import org.springframework.security.web.SecurityFilterChain;
 @Configuration
 public class SecurityConfig {
 	
+	@Autowired
+	DataSource dataSource;
+	
 	/*
 	 * Create this type of Bean for bypassing the default settings
 	 * In this Example we are just keeping basic Authentication which will use 
@@ -35,7 +41,8 @@ public class SecurityConfig {
 	@Bean
 	public SecurityFilterChain defaultSecurityFilterChain(HttpSecurity http) throws Exception {
 
-		http.authorizeHttpRequests((requests) -> requests.anyRequest().authenticated());
+		http.authorizeHttpRequests((requests) -> requests.requestMatchers("/h2-console/**").permitAll()/*only to stop authentication to h2 DB*/
+				.anyRequest().authenticated());
 		// http.formLogin(withDefaults()); //we can stop this in manual configuration
 		/* httpBasic
 		 * In PostMan go to authorization and then select Basic Authorization and give username and password to access 
@@ -50,6 +57,12 @@ public class SecurityConfig {
 	I	 * In Simple Words it will not set any cookie
 		 */
 		http.sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS));
+		/**
+		 * For H2 DB to work we have to do some changes 
+		 */
+		http.csrf(csrf->csrf.disable());
+		http.headers(headers -> headers.frameOptions(frameOptions -> frameOptions.sameOrigin()));
+		
 		return http.build();
 
 	}
