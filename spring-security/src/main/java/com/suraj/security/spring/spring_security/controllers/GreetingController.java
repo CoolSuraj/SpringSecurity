@@ -14,14 +14,15 @@ public class GreetingController {
 		return "Hello World";
 	}
 	
-	
+	@PreAuthorize("hasRole('USER')")  //this also needs @EnableMethodSecurity in config 
 	@GetMapping("/hiuser")
 	public String sayHiuser() {
 		
 		
 		return "Hello User!!";
 	}
-
+	
+	@PreAuthorize("hasRole('ADMIN')")
 	@GetMapping("/hiBoss")
 	public String sayHiToAdmin() {
 		
