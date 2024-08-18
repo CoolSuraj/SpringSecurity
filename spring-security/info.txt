@@ -1,0 +1,1 @@
+Class SpringBootWebSecurityConfiguration can be used to check the basic authentication
