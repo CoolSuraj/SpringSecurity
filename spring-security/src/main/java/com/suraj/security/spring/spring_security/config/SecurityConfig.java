@@ -14,6 +14,8 @@ import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.core.userdetails.User;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
+import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.provisioning.InMemoryUserDetailsManager;
 import org.springframework.security.provisioning.JdbcUserDetailsManager;
 import org.springframework.security.web.SecurityFilterChain;
@@ -75,8 +77,12 @@ public class SecurityConfig {
 		 * with This In Memory user Details Manager we can create multiple users
 		 * {noop} is used to tell Spring to Store this Password as Plain Text 
 		 */
-		UserDetails user1=User.withUsername("user1").password("{noop}Password1").roles("USER").build();
-		UserDetails admin = User.withUsername("admin").password("{noop}admin1").roles("ADMIN").build();
+//		UserDetails user1=User.withUsername("user1").password("{noop}Password1").roles("USER").build();
+		/*
+		 * after adding PasswordEncoder the passwords while saving will not show as plain text but some hashed value
+		 */
+		UserDetails user1=User.withUsername("user1").password(passwordEncoder().encode("Password1")).roles("USER").build();
+		UserDetails admin = User.withUsername("admin").password(passwordEncoder().encode("admin1")).roles("ADMIN").build();
 		
 		JdbcUserDetailsManager userDetailsManager = new JdbcUserDetailsManager(dataSource);
 		userDetailsManager.createUser(user1);
@@ -84,6 +90,12 @@ public class SecurityConfig {
 		return userDetailsManager;
 //		return new InMemoryUserDetailsManager(user1,admin);
 		
+	}
+	
+	@Bean
+	public PasswordEncoder passwordEncoder() {
+		//implementating Bcrypt Hashing 
+		return new BCryptPasswordEncoder();
 	}
 	
 }
